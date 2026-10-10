@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Racing Button Box</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0f111a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #1a1d28;
+            border-radius: 12px;
+            border: 1px solid #2a2e3d;
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff4757;
+            box-shadow: 0 0 8px #ff4757;
+        }
+
+        .status-dot.connected {
+            background-color: #2ed573;
+            box-shadow: 0 0 8px #2ed573;
+        }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a4b0be;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 800px;
+            flex-grow: 1;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #1e2230, #161923);
+            border: 2px solid #2e3548;
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            transition: all 0.1s ease;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            border-color: #00d2d3;
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.5);
+            background: linear-gradient(145deg, #252a3c, #1e2230);
+        }
+
+        .btn-icon {
+            font-size: 28px;
+        }
+
+        .btn-red { border-bottom: 4px solid #ff4757; }
+        .btn-green { border-bottom: 4px solid #2ed573; }
+        .btn-yellow { border-bottom: 4px solid #ffa502; }
+        .btn-blue { border-bottom: 4px solid #1e90ff; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="font-size: 16px; letter-spacing: 1px;">RACING BOX</h2>
+        <div class="status-container">
+            <div id="dot" class="status-dot"></div>
+            <span id="status" class="status-text">DISCONNESSO</span>
+        </div>
+    </div>
+
+    <div class="grid">
+        <button class="btn btn-green" onclick="sendCmd('A')">
+            <span class="btn-icon">⚡</span>
+            <span>START</span>
+        </button>
+        <button class="btn btn-red" onclick="sendCmd('B')">
+            <span class="btn-icon">🛑</span>
+            <span>PIT LIMIT</span>
+        </button>
+        <button class="btn btn-yellow" onclick="sendCmd('X')">
+            <span class="btn-icon">💡</span>
+            <span>LUCI</span>
+        </button>
+        <button class="btn btn-blue" onclick="sendCmd('Y')">
+            <span class="btn-icon">🌧️</span>
+            <span>TERGI</span>
+        </button>
+        <button class="btn btn-blue" onclick="sendCmd('LB')">
+            <span class="btn-icon">📻</span>
+            <span>RADIO</span>
+        </button>
+        <button class="btn btn-yellow" onclick="sendCmd('RB')">
+            <span class="btn-icon">🔧</span>
+            <span>TC / ABS</span>
+        </button>
+    </div>
+
+    <script>
+        let socket;
+
+        function connect() {
+            socket = new WebSocket("ws://2.44.223.55:8765");
+
+            socket.onopen = () => {
+                document.getElementById("status").innerText = "CONNESSO";
+                document.getElementById("status").style.color = "#2ed573";
+                document.getElementById("dot").classList.add("connected");
+            };
+
+            socket.onclose = () => {
+                document.getElementById("status").innerText = "DISCONNESSO";
+                document.getElementById("status").style.color = "#a4b0be";
+                document.getElementById("dot").classList.remove("connected");
+                setTimeout(connect, 2000);
+            };
+        }
+
+        function sendCmd(cmd) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(cmd);
+                if (navigator.vibrate) navigator.vibrate(40);
+            }
+        }
+
+        connect();
+    </script>
+</body>
+</html>

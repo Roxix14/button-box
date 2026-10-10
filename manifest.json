@@ -1,0 +1,10 @@
+{
+  "name": "Racing Button Box",
+  "short_name": "ButtonBox",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0f111a",
+  "theme_color": "#0f111a",
+  "icons": []
+}
